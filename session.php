@@ -16,11 +16,6 @@ if(!session_id()) session_start();
 
 class adlerweb_session {
     /**
-     * @var int Counter for failed login tries
-     */
-    protected $retry_count=0;
-    
-    /**
      * @category config
      * @var int Number of seconds to block a user if he reached our retry-count
      */
@@ -47,6 +42,11 @@ class adlerweb_session {
             return false;
         }
 
+        if(!isset($_SESSION['adlerweb'])) $_SESSION['adlerweb']=array();
+        if(!isset($_SESSION['adlerweb']['session'])) $_SESSION['adlerweb']['session']=array();
+        if(!isset($_SESSION['adlerweb']['session']['retrytime'])) $_SESSION['adlerweb']['session']['retrytime']=0;
+        if(!isset($_SESSION['adlerweb']['session']['retrycount'])) $_SESSION['adlerweb']['session']['retrycount']=0;
+
         $this->smarty_repopulate();
         $this->retry_housekeeping();
     }
@@ -61,7 +61,7 @@ class adlerweb_session {
     public function session_login($user, $pass) {
         $user=strtolower($user);
         if(!$this->session_validUser($user)) {  
-            $this->retry++;
+            $_SESSION['adlerweb']['session']['retrycount']++;
             $this->lasterror='Incorrect username format';
             return false;
         }
@@ -71,13 +71,13 @@ class adlerweb_session {
         }
         $check=$GLOBALS['adlerweb']['sql']->query("SELECT UserID,Password,Level,UIdent,Name FROM Users WHERE Nickname='".$user."' LIMIT 1;");
         if($check->num_rows != 1) {
-            $this->retry++;
+            $_SESSION['adlerweb']['session']['retrycount']++;
             $this->lasterror='User not found';
             return false;
         }
         $check=$check->fetch_object();
         if(!$this->session_comparePassword( $pass, $check->Password )) {
-            $this->retry++;
+            $_SESSION['adlerweb']['session']['retrycount']++;
             $this->lasterror='Incorrect password';
             return false;
         }
@@ -168,11 +168,11 @@ class adlerweb_session {
      * Check for expired retry count
      */
     private function retry_housekeeping() {
-        if($this->retry_count > $this->retry_allowed){
+        if($_SESSION['adlerweb']['session']['retrycount'] > $this->retry_allowed){
             $_SESSION['adlerweb']['session']['retrytime'] = time()+$this->retry_timeout;
-            $this->retry_cont=0;
-        }elseif($this->retry_time > 0 && $this->retry_time <= time()) {
-            $this->retry_time = 0;
+            $_SESSION['adlerweb']['session']['retrycount']=0;
+        }elseif($_SESSION['adlerweb']['session']['retrytime'] > 0 && $_SESSION['adlerweb']['session']['retrytime'] <= time()) {
+            $_SESSION['adlerweb']['session']['retrytime'] = 0;
         }
     }
 }
