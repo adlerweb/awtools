@@ -70,6 +70,10 @@ class adlerweb_session {
             $this->lasterror='Incorrect username format';
             return false;
         }
+        if($this->retry_time >= time()) {
+            $this->lasterror='Too many incorrect tries';
+            return false;
+        }
         $check=$GLOBALS['adlerweb']['sql']->query("SELECT UserID,Password,Level,UIdent,Name FROM Users WHERE Nickname='".$user."' LIMIT 1;");
         if($check->num_rows != 1) {
             $this->retry++;
