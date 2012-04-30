@@ -21,11 +21,6 @@ class adlerweb_session {
     protected $retry_count=0;
     
     /**
-     * @var int Timestamp when user was blocked due to too many login tries
-     */
-    protected $retry_time=0;
-    
-    /**
      * @category config
      * @var int Number of seconds to block a user if he reached our retry-count
      */
@@ -70,7 +65,7 @@ class adlerweb_session {
             $this->lasterror='Incorrect username format';
             return false;
         }
-        if($this->retry_time >= time()) {
+        if(isset($_SESSION['adlerweb']['session']) && isset($_SESSION['adlerweb']['session']['retrytime']) && $_SESSION['adlerweb']['session']['retrytime'] >= time()) {
             $this->lasterror='Too many incorrect tries';
             return false;
         }
