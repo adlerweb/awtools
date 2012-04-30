@@ -12,13 +12,7 @@
  * @env AW_SESSION_NOAUTO bool if defined auto-instantiate is turned off
  */
 
-/**
- * POST
- */
 if(!session_id()) session_start();
-if(!isset($GLOBALS['adlerweb']['sql'])) {
-    die('No SQL-socket in [adlerweb][sql] - Please load AwSQL first...');
-}
 
 class adlerweb_session {
     /**
@@ -52,6 +46,12 @@ class adlerweb_session {
      * Inizialize system
      */
     public function __construct() {
+        //Check for working SQL
+        if(!isset($GLOBALS['adlerweb']['sql'])) {
+            trigger_error('No SQL-socket in [adlerweb][sql] - Please load AwSQL first...', E_USER_ERROR);
+            return false;
+        }
+
         $this->smarty_repopulate();
         $this->retry_housekeeping();
     }
