@@ -1,0 +1,22 @@
+Adlerweb's PHP Toolkit
+
+This pack includes several modules to enhance PHP. All Modules instanziate
+itself upon loading as long as it is not prohibited via configuration
+
+Modules Included:
+=================
+
+mysql.php
+---------
+
+Enhanced error-handling, debugging, security-stuff
+
+session.php
+-----------
+
+Session Management with MySQL user database
+
+smarty.php
+----------
+
+Wrapper to instantiate Smarty (http://www.smarty.net/)
