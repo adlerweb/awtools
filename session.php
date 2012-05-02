@@ -38,10 +38,10 @@ class adlerweb_session {
     public function __construct() {
         //Check for working SQL
         if(!isset($GLOBALS['adlerweb']['sql'])) {
-            trigger_error('No SQL-socket in [adlerweb][sql] - Please load AwSQL first...', E_USER_ERROR);
-            return false;
+            trigger_error('No SQL-socket in [adlerweb][sql] - Please load AwSQL first...', E_USER_WARNING);
         }
 
+        if(!isset($GLOBALS['adlerweb'])) $GLOBALS['adlerweb']=array();
         if(!isset($_SESSION['adlerweb'])) $_SESSION['adlerweb']=array();
         if(!isset($_SESSION['adlerweb']['session'])) $_SESSION['adlerweb']['session']=array();
         if(!isset($_SESSION['adlerweb']['session']['retrytime'])) $_SESSION['adlerweb']['session']['retrytime']=0;
@@ -68,6 +68,9 @@ class adlerweb_session {
         if(isset($_SESSION['adlerweb']['session']) && isset($_SESSION['adlerweb']['session']['retrytime']) && $_SESSION['adlerweb']['session']['retrytime'] >= time()) {
             $this->lasterror='Too many incorrect tries';
             return false;
+        }
+        if(!isset($GLOBALS['adlerweb']['sql'])) {
+            
         }
         $check=$GLOBALS['adlerweb']['sql']->query("SELECT UserID,Password,Level,UIdent,Name FROM Users WHERE Nickname='".$user."' LIMIT 1;");
         if($check->num_rows != 1) {
@@ -125,6 +128,15 @@ class adlerweb_session {
      */
     private function session_getPasswordHash($salt, $password) {
         return $salt.hash('sha256', hash('whirlpool', $salt.$password));
+    }
+    
+    /**
+     * Get a hashed password with a fresh salt
+     * @var string $password
+     * @return string Salted password
+     */
+    public function session_getNewPasswordHash($password) {
+        return $this->session_getPasswordHash($this->session_getPasswordSalt(), $password);
     }
     
     /**
