@@ -25,6 +25,8 @@ class adlerweb_sql extends mysqli {
      * Connect to MySQL via MySQLi and the predefined credentials
      */
     function __construct() {
+        if(!isset($GLOBALS['adlerweb'])) $GLOBALS['adlerweb']=array();
+        
         if(!defined('AW_SQL_SERV') || !defined('AW_SQL_USER') || !defined('AW_SQL_PASS') || !defined('AW_SQL_DATB')) {
             trigger_error('Tried to load MySQL without proper configuration', E_USER_ERROR);
             return false;
