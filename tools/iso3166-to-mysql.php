@@ -17,9 +17,8 @@ CREATE TABLE IF NOT EXISTS `Countries` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Source: http://www.iso.org/iso/country_codes/iso_3166_code_l';
  */
 
-require('../../../config.php');    //Set this to a configuration containing valid
+require('../../../config.php'); //Set this to a configuration containing valid
                                 //MySQL credentials
-                                
 require('../mysql.php');
 
 $list = file("http://www.iso.org/iso/list-en1-semic-3.txt");
