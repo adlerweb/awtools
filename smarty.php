@@ -17,10 +17,15 @@
 class adlerweb_smarty {
     
     /**
+     * @var obj $s - Local smarty session
+     */
+    public $s;
+    
+    /**
      * Load Smarty (if not done so already) and initialize some basic stuff
      * @var string $prefix defaults to tpl - change to instanciate multiple template sessions
      */
-    function __construct($prefix = 'tpl') {
+    function __construct($prefix = 'tpl', $tpldir = 'tpl/src/', $compdir = 'tpl/compile/', $config = 'tpl/config/') {
         if(!class_exists('Smarty')) {
             if(file_exists('smarty/Smarty.class.php')) {
                 require_once('smarty/Smarty.class.php');
@@ -36,24 +41,32 @@ class adlerweb_smarty {
             }
         }
         
-        $GLOBALS['adlerweb'][$prefix] = new Smarty;
+        $this->s = new Smarty;
 
-        if(defined('AW_SMARTY_CACHE') && AW_SMARTY_CACHE === false) $GLOBALS['adlerweb'][$prefix]->clear_all_cache();
+        if(defined('AW_SMARTY_CACHE') && AW_SMARTY_CACHE === false) $this->s->clear_all_cache();
         
-        $GLOBALS['adlerweb'][$prefix]->template_dir = 'tpl/src/';
-        $GLOBALS['adlerweb'][$prefix]->compile_dir  = 'tpl/compile/';
-        $GLOBALS['adlerweb'][$prefix]->config_dir   = 'tpl/config/';
-        if(defined('AW_SMARTY_DEBUG')) $GLOBALS['adlerweb'][$prefix]->debugging    = AW_SMARTY_DEBUG;
+        if(!is_dir($tpldir)) {
+            trigger_error('Template directory "'.$tpldir.'" is not accessible', E_USER_ERROR);
+            return false;
+        }
         
-        $GLOBALS['adlerweb'][$prefix]->assign('currentYear', strftime("%Y", time())); //Used for copyright etc
+        if(!is_dir($compdir)) {
+            trigger_error('Compile directory "'.$compdir.'" is not accessible', E_USER_ERROR);
+            return false;
+        }
+        
+        if(!is_dir($config)) {
+            trigger_error('Configuration directory "'.$config.'" is not accessible', E_USER_ERROR);
+            return false;
+        }
+        
+        $this->s->template_dir = $tpldir;
+        $this->s->compile_dir  = $compdir;
+        $this->s->config_dir   = $config;
+        if(defined('AW_SMARTY_DEBUG')) $this->s->debugging    = AW_SMARTY_DEBUG;
+        
+        $this->s->assign('currentYear', strftime("%Y", time())); //Used for copyright etc
     }
-}
-
-/**
- * Instantiate new global AwSmarty-object if not deactivated
- */
-if(!defined('AW_SMARTY_NOAUTO')) {
-    $GLOBALS['adlerweb']['tpl_wrapper'] = new adlerweb_smarty();
 }
 
 ?>
