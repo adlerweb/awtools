@@ -6,6 +6,11 @@ itself upon loading as long as it is not prohibited via configuration
 Modules Included:
 =================
 
+mysql.stmt.php
+---------
+
+MySQL/MariaDB wrapper for easy usage of prepared statements
+
 mysql.php
 ---------
 
