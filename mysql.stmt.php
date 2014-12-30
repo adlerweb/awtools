@@ -95,7 +95,6 @@ class ATK_mysql {
             if($this->debug >= 2) $msg .= ' - >>'.print_r($argtypes, true).'<< - >>'.print_r($args, true).'<<"';
             trigger_error($msg, E_USER_ERROR);
         }
-        
         call_user_func_array(array($stmt, "bind_param"), $this->util_refValues(array_merge((array)$argtypes, $args)));
         
         if(!$stmt->execute()) {
@@ -110,11 +109,12 @@ class ATK_mysql {
         if($type == 'DELETE') return $stmt->affected_rows;
         
         $meta = $stmt->result_metadata();
-        while ($metaArray = $meta->fetch_field()) {  
+        while ($metaArray = $meta->fetch_field()) {
             $parameters[] = &$row[$metaArray->name];  
         }  
         call_user_func_array(array($stmt, 'bind_result'), $parameters);
         
+        $items = array();
         while ($stmt->fetch()) {
             foreach($row as $key => $value) {
                 $copy[$key] = $value;
@@ -122,7 +122,7 @@ class ATK_mysql {
             $items[] = $copy;
         }
         
-        if($stmt->num_rows == 0) return false;
+        if(count($items) == 0) return false;
         
         return $items;
     }
