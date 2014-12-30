@@ -128,6 +128,44 @@ class ATK_mysql {
     }
     
     /**
+     * Execute SELECT query as prepared statement and return a single element
+     *
+     * @var string SQL-query - ? as placeholder for variables
+     * @var string string of argument types. 1 character per argument.
+     *      i corresponding variable has type integer
+     *      d corresponding variable has type double
+     *      s corresponding variable has type string
+     *      b corresponding variable is a blob and will be sent in packets
+     * @var string|array variable(s)
+     *      array containing intended variables
+     *      number of elements must match character count in argument type list
+     *      if only one argument is used it may be supplied as string
+     * @var string return only this field (optional)
+     *
+     * @return bool|int|array returned data
+     *         returns false if an error occours
+     *         returns number of affected rows as integer for UPDATE/DELETE queries
+     *         returns inserted ID as integer for INSERT queries
+     *         returns associated array of the first result line
+     *         returns string when a single field was requested
+     *
+     * @note Since all results are loaded into RAM this function should not be
+     *       used for queries that are supposed to return massive datasets. Use
+     *       LIMIT 1; whenever possible.
+     *
+     **/
+    function querystmt_single($sql, $argtypes, $args, $field=false) {
+        $res = $this->querystmt($sql, $argtypes, $args);
+        
+        if(!is_array($res)) return $res;
+        if(!$field) return $res;
+        
+        if(!isset($res[0][$field])) return false;
+        
+        return $res[0][$field];
+    }
+    
+    /**
      * Execute query as standard SQL query
      *
      * Extends original method to conform to this class' error methology
@@ -146,6 +184,31 @@ class ATK_mysql {
             return false;
         }
         return $ret;
+    }
+    
+    /**
+     * Execute standard SELECT query and return a single element
+     *
+     * @var string SQL-query - ? as placeholder for variables
+     * @var string return only this field (optional)
+     * @return bool|array|string returned data
+     *         returns false if an error occours
+     *         returns associated array of the first result line on success
+     *         returns string when a single field was requested
+     *
+     * @note Use LIMIT 1; whenever possible.
+     *
+     **/
+    function query_single($sql, $field=false) {
+        $res = $this->query($sql);
+        if(!$res) return false;
+        
+        $ret=$res->fetch_assoc();
+        if(!$field) return $ret;
+        
+        if(!isset($ret[$field])) return false;
+        
+        return $ret[$field];
     }
     
     /**
@@ -321,7 +384,9 @@ class ATK_mysql {
                                     array_merge($args, $index_clean_args)
                                 );
         }
-    }
-    
+    }  
 }
+
+
+
 ?>
