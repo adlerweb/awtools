@@ -158,7 +158,7 @@ class ATK_mysql {
         $res = $this->querystmt($sql, $argtypes, $args);
         
         if(!is_array($res)) return $res;
-        if(!$field) return $res;
+        if(!$field) return $res[0];
         
         if(!isset($res[0][$field])) return false;
         
