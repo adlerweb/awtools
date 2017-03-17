@@ -46,6 +46,7 @@ class adlerweb_smarty {
         if(defined('AW_SMARTY_DEBUG')) $GLOBALS['adlerweb'][$prefix]->debugging    = AW_SMARTY_DEBUG;
         
         $GLOBALS['adlerweb'][$prefix]->assign('currentYear', strftime("%Y", time())); //Used for copyright etc
+        $GLOBALS['adlerweb']['tpl']->assign('menue',  'session_login');
     }
 }
 
