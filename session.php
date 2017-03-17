@@ -20,25 +20,25 @@ class adlerweb_session {
      * @var int Number of seconds to block a user if he reached our retry-count
      */
     protected $retry_timeout = 300;
-    
+
     /**
      * @category config
      * @var int How many retries before we block an user
      */
     protected $retry_allowed = 3;
-    
+
     /**
      * @var bool|string False or human-readable description of last error
      */
     public $lasterror='';
-    
+
     /**
      * Inizialize system
      */
     public function __construct() {
         //Check for working SQL
         if(!isset($GLOBALS['adlerweb']['sql'])) {
-            trigger_error('No SQL-socket in [adlerweb][sql] - Please load AwSQL first...', E_USER_WARNING);
+            trigger_error('No SQL-socket in [adlerweb][sql] - Please load AwSQL STMT first...', E_USER_WARNING);
         }
 
         if(!isset($GLOBALS['adlerweb'])) $GLOBALS['adlerweb']=array();
@@ -50,7 +50,7 @@ class adlerweb_session {
         $this->smarty_repopulate();
         $this->retry_housekeeping();
     }
-    
+
     /**
      * Try to login
      * On success $_SESSION['adlerweb']['session'] is populated with user's details
@@ -60,7 +60,7 @@ class adlerweb_session {
      */
     public function session_login($user, $pass) {
         $user=strtolower($user);
-        if(!$this->session_validUser($user)) {  
+        if(!$this->session_validUser($user)) {
             $_SESSION['adlerweb']['session']['retrycount']++;
             $this->lasterror='Incorrect username format';
             return false;
@@ -70,27 +70,26 @@ class adlerweb_session {
             return false;
         }
         if(!isset($GLOBALS['adlerweb']['sql'])) {
-            
+
         }
-        $check=$GLOBALS['adlerweb']['sql']->query("SELECT UserID,Password,Level,UIdent,Name FROM Users WHERE Nickname='".$user."' LIMIT 1;");
-        if($check->num_rows != 1) {
+        $check=$GLOBALS['adlerweb']['sql']->querystmt_single("SELECT UserID,Password,Level,UIdent,Name FROM Users WHERE Nickname=? LIMIT 1;", 's', $user);
+        if(!$check) {
             $_SESSION['adlerweb']['session']['retrycount']++;
             $this->lasterror='User not found';
             return false;
         }
-        $check=$check->fetch_object();
-        if(!$this->session_comparePassword( $pass, $check->Password )) {
+        if(!$this->session_comparePassword( $pass, $check['Password'] )) {
             $_SESSION['adlerweb']['session']['retrycount']++;
             $this->lasterror='Incorrect password';
             return false;
         }
-        $_SESSION['adlerweb']['session']['level'] = $check->Level;
-        $_SESSION['adlerweb']['session']['short'] = $check->UIdent;
-        $_SESSION['adlerweb']['session']['user']  = $check->Name;
-        $_SESSION['adlerweb']['session']['UID']   = $check->UserID;
+        $_SESSION['adlerweb']['session']['level'] = $check['Level'];
+        $_SESSION['adlerweb']['session']['short'] = $check['UIdent'];
+        $_SESSION['adlerweb']['session']['user']  = $check['Name'];
+        $_SESSION['adlerweb']['session']['UID']   = $check['UserID'];
         return true;
     }
-    
+
     /**
      * Check if the current user is logged in
      * @return bool|int false or integer of user's permission level
@@ -99,7 +98,7 @@ class adlerweb_session {
         if(!isset($_SESSION['adlerweb']['session']['level']) || $_SESSION['adlerweb']['session']['level']<=0) return false;
         return $_SESSION['adlerweb']['session']['level'];
     }
-    
+
     /**
      * Close a session
      */
@@ -109,7 +108,7 @@ class adlerweb_session {
             session_start();
         }
     }
-    
+
     /**
      * Modified password salt generator
      * @author original by richardlord.net
@@ -118,7 +117,7 @@ class adlerweb_session {
     private function session_getPasswordSalt() {
         return substr(str_pad(dechex(mt_rand()), 8, '0', STR_PAD_LEFT), -8);
     }
-    
+
     /**
      * Modified password generator
      * @author original by richardlord.net
@@ -129,7 +128,7 @@ class adlerweb_session {
     private function session_getPasswordHash($salt, $password) {
         return $salt.hash('sha256', hash('whirlpool', $salt.$password));
     }
-    
+
     /**
      * Get a hashed password with a fresh salt
      * @var string $password
@@ -138,7 +137,7 @@ class adlerweb_session {
     public function session_getNewPasswordHash($password) {
         return $this->session_getPasswordHash($this->session_getPasswordSalt(), $password);
     }
-    
+
     /**
      * Compare a plaintext password with its salted version
      * @author original by richardlord.net
@@ -150,7 +149,7 @@ class adlerweb_session {
         $salt = substr($hash, 0, 8);
         return $hash == $this->session_getPasswordHash($salt, $password);
     }
-    
+
     /**
      * Limit valid usernames to a specific regex (a-z, 0-9, - and _)
      * @var string $user Username
@@ -159,7 +158,7 @@ class adlerweb_session {
     private function session_validUser($user) {
         return preg_match("/^[a-z0-9\-_]+$/", $user);
     }
-    
+
     /**
      * Repopulate smarty's session-vars if AwSmarty is used
      */
@@ -175,7 +174,7 @@ class adlerweb_session {
             }
         }
     }
-    
+
     /**
      * Check for expired retry count
      */
