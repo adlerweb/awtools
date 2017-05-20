@@ -19,6 +19,11 @@ class ATK_mysql {
      */
     private $sql;
     
+    /**
+     * @var int Last MySQL error number
+     */
+    public $errno = 0;
+
     /*
      * @var bool|int false=off, >0 = on
      * false = report only stripped errors
@@ -31,7 +36,7 @@ class ATK_mysql {
     
     public function __construct($serv, $user, $pass, $datb) {
         $this->sql = new mysqli($serv, $user, $pass, $datb);
-        if(!$this->sql) return false;
+        $this->errno = $this->sql->connect_errno;
     }
     
     /**
