@@ -10,4 +10,10 @@
             "email": "awtools@adlerweb.info"
         }
     ],
+    "support": {
+        "issues": "https://github.com/adlerweb/awtools/issues"
+    },
+    "require": {
+        "php": ">=5.2"
+    }
 }
