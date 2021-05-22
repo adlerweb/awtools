@@ -42,8 +42,8 @@ class adlerweb_sql extends mysqli {
      * @var string SQL-Query
      * @return mixed SQL-Query-Result
      */
-    function query($sql) {
-        $result = parent::query($sql);
+    function query($sql, int $result_mode = MYSQLI_STORE_RESULT) {
+        $result = parent::query($sql, $result_mode);
         if($result === false && AW_SQL_DEBUG) {
             trigger_error('SQL-Query failed: '.$sql.' -> '.$this->error, E_USER_WARNING);
         }elseif(AW_SQL_DEBUG_SHOW) {
