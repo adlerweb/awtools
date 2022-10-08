@@ -101,6 +101,12 @@ class ATK_mysql {
             trigger_error($msg, E_USER_ERROR);
         }
         call_user_func_array(array($stmt, "bind_param"), $this->util_refValues(array_merge((array)$argtypes, $args)));
+
+        for($i=0; $i<strlen($argtypes); $i++) {
+            if($argtypes[$i] == 'b') {
+                $stmt->send_long_data($i, $args[$i]);
+            }
+        }
         
         if(!$stmt->execute()) {
             $msg = $stmt->error;
