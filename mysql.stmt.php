@@ -333,7 +333,7 @@ class ATK_mysql {
                 if($msg != '') trigger_error($msg, E_USER_WARNING);
             }else{
                 $index_clean_fields[] = $index_temp;
-                $index_clean_argtype .= $argtypes{$fi};
+                $index_clean_argtype .= $argtypes[fi];
                 $index_clean_args[] = $args[$fi];
             }
         }
